@@ -41,21 +41,30 @@ app.get("/createOwnHero", (request,response)=> {
 app.post("/findComicHeroResult", async (request, response)=> {
     let marvelBaseUrl = `https://superheroapi.com/api/${apiKey}/search`;
     let heroName = request.body.name;
-    let result = await fetch(marvelBaseUrl + `/${heroName}`);
-    let json = await result.json();
-    if (json.response != 'error') {
-        let powerStats = json?.results[0]?.powerstats;
-        let variables = {
-            heroName: heroName,
-            heroIntelligence: powerStats.intelligence,
-            heroStrength: powerStats.strength,
-            heroSpeed: powerStats.speed,
-            heroImage: json.results[0]?.image.url
+    try {
+        let result = await fetch(marvelBaseUrl + `/${heroName}`);
+        let json = await result.json();
+        if (json.response != 'error') {
+            let powerStats = json?.results[0]?.powerstats;
+            let variables = {
+                heroName: heroName,
+                heroIntelligence: powerStats.intelligence,
+                heroStrength: powerStats.strength,
+                heroSpeed: powerStats.speed,
+                heroImage: json.results[0]?.image.url
         }
         response.render("findComicHeroResult", variables);
-    } else {
-        response.render("noResults", {heroName: heroName});
+        } else {
+            response.render("noResults", {heroName: heroName});
+        }
+        
+    } catch (e) {
+        console.log(e);
+        
+    } finally {
+        console.log("Worked");
     }
+    
 })
 app.get("/getAllHeroes", async(request,response)=>{
     try {
